@@ -8,10 +8,10 @@ require 'twitter_ebooks'
 Ebooks::Bot.new("final140") do |bot|
   # Consumer details come from registering an app at https://dev.twitter.com/
   # OAuth details can be fetched with https://github.com/marcel/twurl
-  bot.consumer_key = "" # Your app consumer key
-  bot.consumer_secret = "" # Your app consumer secret
-  bot.oauth_token = "" # Token connecting the app to this account
-  bot.oauth_token_secret = "" # Secret connecting the app to this account
+  config.consumer_key = Config::CONSUMER_KEY
+  config.consumer_secret = Config::CONSUMER_SECRET
+  config.oauth_token = Config::OAUTH_TOKEN
+  config.oauth_token_secret = Config::OAUTH_TOKEN_SECRET
 
   bot.on_message do |dm|
     # Reply to a DM
@@ -19,8 +19,7 @@ Ebooks::Bot.new("final140") do |bot|
   end
 
   bot.on_follow do |user|
-    # Follow a user back
-    # bot.follow(user[:screen_name])
+    # attempt to index tweets
   end
 
   bot.on_mention do |tweet, meta|
@@ -33,9 +32,7 @@ Ebooks::Bot.new("final140") do |bot|
     # bot.reply(tweet, meta[:reply_prefix] + "nice tweet")
   end
 
-  bot.scheduler.every '24h' do
-    # Tweet something every 24 hours
-    # See https://github.com/jmettraux/rufus-scheduler
-    # bot.tweet("hi")
+  bot.scheduler.every '1h' do
+    # Tweet some number of last-tweets every hour
   end
 end
