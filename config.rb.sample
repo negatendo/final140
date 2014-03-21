@@ -1,0 +1,9 @@
+module Final140
+  module Config
+    # Your Twitter app auth details from https://dev.twitter.com/
+    CONSUMER_KEY = ""
+    CONSUMER_SECRET = ""
+    OAUTH_TOKEN = ""
+    OAUTH_TOKEN_SECRET = ""
+  end
+end

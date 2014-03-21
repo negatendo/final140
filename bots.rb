@@ -1,9 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'twitter_ebooks'
-
-# This is an example bot definition with event handlers commented out
-# You can define as many of these as you like; they will run simultaneously
+require_relative 'config'
 
 Ebooks::Bot.new("final140") do |bot|
   # Consumer details come from registering an app at https://dev.twitter.com/
