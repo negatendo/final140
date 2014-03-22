@@ -1,12 +1,27 @@
 #!/usr/bin/env ruby
 
 require 'twitter_ebooks'
+require 'term/ansicolor'
 
+#load config
 begin
   require File.dirname(__FILE__) + '/config'
 rescue LoadError
   STDERR.puts "Create a config.rb file first"
   exit
+end
+
+#monkeypatch of bot log function to add date
+include Term::ANSIColor
+module Ebooks
+  class Bot
+    def log(*args)
+      t = Time.new
+      timestamp = t.getlocal('-07:00') #TODO adjust per location
+      STDERR.puts green(bold(timestamp.to_s)) + blue(bold(" @#{@username}: ")) + args.map(&:to_s).join(' ')
+      STDERR.flush
+    end
+  end
 end
 
 #monkeypatch of Ebooks::Archive to use bot credentials
@@ -24,8 +39,6 @@ module Ebooks
     end
   end
 end
-
-
 
 #setup the bot and configure its behavior
 Ebooks::Bot.new('final140') do |bot|
@@ -73,7 +86,7 @@ Ebooks::Bot.new('final140') do |bot|
       Ebooks::Archive.new(handle,"corpus/#{handle}.json").sync
       Ebooks::Model.consume("corpus/#{handle}.json").save("model/#{handle}.model")  
     rescue
-      self.log("Unable to archive " + handle + " - private account?")
+      self.log red("Unable to archive " + handle + " - private account?")
     end
   end
 end
