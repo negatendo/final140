@@ -9,6 +9,25 @@ rescue LoadError
   exit
 end
 
+#monkeypatch of Ebooks::Archive to use bot credentials
+module Ebooks
+  class Archive
+    def make_client
+      Twitter.configure do |config|
+        config.consumer_key = BotConfig::CONSUMER_KEY
+        config.consumer_secret = BotConfig::CONSUMER_SECRET
+        config.oauth_token = BotConfig::OAUTH_TOKEN
+        config.oauth_token_secret = BotConfig::OAUTH_TOKEN_SECRET
+      end
+
+      Twitter::Client.new
+    end
+  end
+end
+
+
+
+#setup the bot and configure its behavior
 Ebooks::Bot.new('final140') do |bot|
   # Consumer details come from registering an app at https://dev.twitter.com/
   # OAuth details can be fetched with https://github.com/marcel/twurl
@@ -18,7 +37,7 @@ Ebooks::Bot.new('final140') do |bot|
   bot.oauth_token_secret = BotConfig::OAUTH_TOKEN_SECRET
 
   bot.on_startup do
-    bot.tweet('hello world')
+    self.run_archiver('inky')
   end
 
   bot.on_message do |dm|
@@ -48,12 +67,22 @@ Ebooks::Bot.new('final140') do |bot|
     # - generate image of tweet
     # - tweet image @ follower
   end
+
+  def self.run_archiver(handle)
+    begin 
+      Ebooks::Archive.new(handle,"corpus/#{handle}.json").sync
+      Ebooks::Model.consume("corpus/#{handle}.json").save("model/#{handle}.model")  
+    rescue
+      self.log("Unable to archive " + handle + " - private account?")
+    end
+  end
 end
 
-#start yr engines
+#start the bot(s)
 EM.run do
   Ebooks::Bot.all.each do |bot|
     bot.start
   end
 end
+
  
